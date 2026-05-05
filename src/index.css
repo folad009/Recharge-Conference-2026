@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-brand-primary: #4F46E5; /* Indigo 600 */
+  --color-brand-secondary: #EAB308; /* Yellow 500 - Not much used in theme but kept for fallback */
+  --color-brand-accent: #6366F1; /* Indigo 500 */
+  --color-brand-dark: #0F172A; /* Slate 900 */
+  --color-brand-light: #F8FAFC; /* Slate 50 */
+}
+
+/* Custom scrolling behavior for smooth anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-brand-light);
+  color: var(--color-brand-dark);
+}
+
+/* Base Input Styles */
+input, textarea, select {
+  @apply w-full px-4 py-3 border border-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 transition-colors bg-white font-mono text-sm;
+}
+
+/* Button variants - Geometric styling */
+.btn-primary {
+  @apply bg-slate-900 text-white px-6 py-3 text-xs font-bold uppercase tracking-tighter hover:bg-indigo-600 transition-colors shadow-none rounded-none inline-flex items-center justify-center gap-2;
+}
+
+.btn-secondary {
+  @apply border-2 border-slate-900 text-slate-900 px-6 py-3 text-xs font-bold uppercase tracking-tighter hover:bg-slate-900 hover:text-white transition-colors shadow-none rounded-none inline-flex items-center justify-center gap-2;
+}
+
+.btn-outline {
+  @apply border-2 border-white text-white px-6 py-3 text-xs font-bold uppercase tracking-tighter hover:bg-white hover:text-slate-900 transition-colors shadow-none rounded-none inline-flex items-center justify-center gap-2;
+}
