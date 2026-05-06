@@ -404,7 +404,7 @@ function Hero() {
               - 5th, 2026
             </div>
             <div className="hidden sm:block text-[#dd7b30]">/</div>
-            <div className="flex items-center gap-2 text-center">
+            <div className="flex items-center gap-2">
               <span className="opacity-60 text-[#dd7b30]">Location:</span> The
               Goodland - Ifako Bus Stop, Ogudu, <br />
               Oworoshoki Expressway, Lagos{" "}
