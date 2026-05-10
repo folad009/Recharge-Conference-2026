@@ -1158,7 +1158,7 @@ function RegistrationAndHotel() {
 
     ctx.fillStyle = "#818cf8"; // indigo-400
     ctx.font = "bold 20px monospace";
-    ctx.fillText("LEADERSHIP CONFERENCE", canvas.width / 2, 220);
+    ctx.fillText("RECHARGE CONFERENCE 2026", canvas.width / 2, 220);
 
     // Divider
     ctx.strokeStyle = "#334155"; // slate-700
@@ -1171,7 +1171,7 @@ function RegistrationAndHotel() {
     // Attendee tag
     ctx.fillStyle = "#4f46e5";
     ctx.font = "bold 24px monospace";
-    ctx.fillText("VIP ATTENDEE", canvas.width / 2, 380);
+    ctx.fillText("ATTENDEE", canvas.width / 2, 380);
 
     // Name
     const fullName = `${firstName} ${lastName}`.trim().toUpperCase() || "GUEST";
@@ -1190,8 +1190,8 @@ function RegistrationAndHotel() {
     // Dates & Location
     ctx.fillStyle = "#94a3b8"; // slate-400
     ctx.font = "20px monospace";
-    ctx.fillText("OCTOBER 15-16, 2026", canvas.width / 2, 650);
-    ctx.fillText("MAIN VENUE", canvas.width / 2, 690);
+    ctx.fillText("JULY 1st - 5th, 2026", canvas.width / 2, 650);
+    ctx.fillText("THE GOODLAND, IFAKO BUS-STOP, OGUDU OWOROSHOKI EXPRESSWAY, LAGOS", canvas.width / 2, 690);
 
     const dataUrl = canvas.toDataURL("image/png");
     const a = document.createElement("a");
