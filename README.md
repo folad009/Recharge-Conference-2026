@@ -11,6 +11,7 @@ The site presents event information in a clear, single-page format, including th
 - Tailwind CSS 4
 - Motion (`motion`)
 - Lucide React icons
+- [Convex](https://convex.dev) (reactive backend for registrations + live attendee count)
 
 ## Features
 
@@ -40,6 +41,19 @@ Or with pnpm:
 pnpm install
 ```
 
+### One-time: Provision the Convex backend
+
+The registration form is backed by Convex. The first time you set up the
+project, run:
+
+```bash
+npx convex dev
+```
+
+This logs you in, provisions a dev deployment, writes `VITE_CONVEX_URL`
+into `.env.local`, and generates `convex/_generated/`. Leave it running
+in a second terminal — it watches `convex/` and pushes changes live.
+
 ### Run Development Server
 
 ```bash
@@ -64,6 +78,9 @@ The app runs on:
 .
 ├── index.html
 ├── package.json
+├── convex
+│   ├── schema.ts          # registrations table + indexes
+│   └── registrations.ts   # `register` mutation + live `count` query
 ├── src
 │   ├── App.tsx
 │   └── main.tsx

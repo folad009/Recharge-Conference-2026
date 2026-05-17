@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useMutation, useQuery } from "convex/react";
+import { ConvexError } from "convex/values";
+import { api } from "../convex/_generated/api";
 import {
   Calendar,
   MapPin,
@@ -18,9 +21,9 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
-  MessageSquare,
-  Star,
   Download,
+  Play,
+  Youtube,
 } from "lucide-react";
 
 const NAV_LINKS = [
@@ -36,221 +39,423 @@ const SPEAKERS = [
   {
     name: "Yemi Davids",
     role: "Lead Pastor, Global Impact Church",
-    image: "https://picsum.photos/seed/pastor/400/400",
+    image: "/images/speakers/RC-Speaker-Yemi-Davids.jpg",
   },
   {
     name: "Bimbo Davids",
     role: "Lead Pastor, Global Impact Church",
-    image: "https://picsum.photos/seed/worship/400/400",
+    image: "/images/speakers/RC-Speaker-Bimbo-Davids.jpg",
   },
   {
     name: "Nathaniel Bassey",
-    role: "Guest Speaker",
-    image: "https://picsum.photos/seed/speaker3/400/400",
+    role: "Pastor, Singer, and Worship Leader",
+    image: "/images/speakers/RC-Speaker-Nathaniel-Bassey.jpg",
   },
   {
     name: "Joshua Selman",
-    role: "Community Outreach",
-    image: "https://picsum.photos/seed/speaker4/400/400",
+    role: "Senior Pastor of Koinonia Global",
+    image: "/images/speakers/RC-Speakers-Joshua.jpg",
   },
   {
     name: "Bishop Funke Felix-Adejumo",
-    role: "Strategic Growth",
-    image: "https://picsum.photos/seed/speaker5/400/400",
+    role: "Co-founder of Agape Christian Ministries Worldwide",
+    image: "/images/speakers/RC-Speakers-Funke.jpg",
   },
   {
     name: "Godman Akinlabi",
-    role: "Strategic Growth",
-    image: "https://picsum.photos/seed/speaker5/400/400",
+    role: "Lead Pastor of The Elevation Church",
+    image: "/images/speakers/RC-Speakers-Godman.jpg",
   },
   {
     name: "Lawrence Oyor",
-    role: "Strategic Growth",
-    image: "https://picsum.photos/seed/speaker5/400/400",
+    role: "Senior Pastor of The Davidic Generation Church",
+    image: "/images/speakers/RC-Speakers-Lawrance.jpg",
   },
   {
     name: "David Oyedepo Jnr.",
-    role: "Strategic Growth",
-    image: "https://picsum.photos/seed/speaker5/400/400",
+    role: "Resident Pastor of Living Faith Church, Canaanland, Ota",
+    image: "/images/speakers/RC-Speakers-Oyedepo-jnr.jpg",
   },
   {
     name: "Michael Orokpo",
-    role: "Strategic Growth",
-    image: "https://picsum.photos/seed/speaker5/400/400",
+    role: "Founder Encounter Jesus Ministries International",
+    image: "/images/speakers/RC-Speakers-Orokpo.jpg",
   },
   {
     name: "Mercy Chinwo-Blessed",
-    role: "Strategic Growth",
-    image: "https://picsum.photos/seed/speaker5/400/400",
+    role: "Singer, and Worship Leader",
+    image: "/images/speakers/RC-Speaker-Mercy-Chinwo.jpg",
   },
 
   {
     name: "Chris Ugoh",
-    role: "Strategic Growth",
-    image: "https://picsum.photos/seed/speaker5/400/400",
+    role: "Senior Pastor of The Family House Church",
+    image: "/images/speakers/RC-Speakers-Chris.jpg",
   },
   {
     name: "Sola Osunmakinde",
-    role: "Strategic Growth",
-    image: "https://picsum.photos/seed/speaker5/400/400",
+    role: "Senior Pastor of the Household of David",
+    image: "/images/speakers/RC-Speakers-Sola.jpg",
   },
    {
     name: "Niyi Eboda",
-    role: "Strategic Growth",
-    image: "https://picsum.photos/seed/speaker5/400/400",
+    role: "Senior Pastor, HarvestHouse Christian Center",
+    image: "/images/speakers/RC-Speakers-Niyi.jpg",
   },
    {
-    name: "ID Cabasa",
-    role: "Strategic Growth",
-    image: "https://picsum.photos/seed/speaker5/400/400",
+    name: "Kunle Soriyan",
+    role: "Nigerian polymath, futurist, and leadership strategist",
+    image: "/images/speakers/RC-Speaker-Kunle-Soriyian.jpg",
   },
    {
     name: "Kaestrings",
-    role: "Strategic Growth",
-    image: "https://picsum.photos/seed/speaker5/400/400",
+    role: "Singer, and Worship Leader",
+    image: "/images/speakers/RC-Speaker-KStrings.jpg",
   },
 ];
 
-const SCHEDULE = [
+type ScheduleEvent = {
+  time: string;
+  title: string;
+  tag?: string;
+};
+
+type ScheduleDay = {
+  day: string;
+  date: string;
+  label: string;
+  events: ScheduleEvent[];
+};
+
+const SCHEDULE: ScheduleDay[] = [
   {
-    day: "Friday",
-    date: "Oct 15",
+    day: "Wednesday",
+    date: "1 July",
+    label: "Opening Night",
+    events: [{ time: "5:30 PM", title: "Opening Night Service" }],
+  },
+  {
+    day: "Thursday – Saturday",
+    date: "2 – 4 July",
+    label: "Main Conference",
     events: [
+      { time: "9:00 AM", title: "Morning Sessions" },
       {
-        time: "05:00PM",
-        title: "Registration & Check-in",
-        description: "Grab your welcome packet and badge.",
-        type: "General",
+        time: "1:30 PM",
+        title: "Afternoon Sessions",
+        tag: "Youth Conference",
       },
-      {
-        time: "07:00PM",
-        title: "Opening Night Worship",
-        description: "Led by Sarah Jenkins and the City Church Band.",
-        type: "Worship",
-      },
-      {
-        time: "08:30PM",
-        title: "Keynote Session 1",
-        description: "Dr. Marcus Johnson on 'The Power of Renewal'.",
-        type: "Keynote",
-      },
+      { time: "5:30 PM", title: "Evening Sessions" },
     ],
   },
   {
-    day: "Saturday",
-    date: "Oct 16",
+    day: "Sunday",
+    date: "5 July",
+    label: "Sunday Services",
     events: [
-      {
-        time: "09:00AM",
-        title: "Morning Devotion & Worship",
-        description: "Start the day with prayer and music.",
-        type: "Worship",
-      },
-      {
-        time: "10:30AM",
-        title: "Breakout Sessions",
-        description:
-          "Choose from Leadership, Youth Ministry, or Discipleship tracks.",
-        type: "Breakout",
-      },
-      {
-        time: "12:00PM",
-        title: "Lunch Break",
-        description: "Food trucks available on site.",
-        type: "General",
-      },
-      {
-        time: "02:00PM",
-        title: "Keynote Session 2",
-        description: "Rev. Thomas Mitchell.",
-        type: "Keynote",
-      },
-      {
-        time: "05:00PM",
-        title: "Breakout Sessions",
-        description: "Afternoon tracks and workshops.",
-        type: "Breakout",
-      },
-      {
-        time: "07:00PM",
-        title: "Closing Night Celebration",
-        description: "A final night of worship and an extended ministry time.",
-        type: "Worship",
-      },
+      { time: "7:15 AM", title: "First Service" },
+      { time: "9:00 AM", title: "Second Service" },
     ],
   },
 ];
 
-const FAQS = [
+const FAQS: { question: string; answer: React.ReactNode }[] = [
   {
-    question: "Is there a cost to attend?",
-    answer:
-      "No, the Recharge Conference is completely free! We do ask that you register to help us prepare.",
+    question: "What date is the Recharge Conference 2026?",
+    answer: (
+      <p>
+        RC 2026 holds from{" "}
+        <strong className="text-slate-900">
+          July 1st to July 5th, 2026
+        </strong>
+        .
+      </p>
+    ),
   },
   {
-    question: "Is childcare provided?",
-    answer:
-      "Yes, childcare is provided for children ages 6 months to 10 years during all main sessions. Please denote this on your registration.",
+    question: "What is the theme for Recharge Conference 2026?",
+    answer: (
+      <p>
+        This year's theme is{" "}
+        <strong className="text-slate-900">"Kingdom Greatness."</strong>
+      </p>
+    ),
   },
   {
-    question: "Will the sessions be recorded?",
-    answer:
-      "Yes, all main keynote sessions will be recorded and available on our church YouTube channel a week after the event.",
+    question: "Where is the venue for Recharge Conference 2026?",
+    answer: (
+      <p>
+        Global Impact Church
+        <br />
+        The Goodland, Ifako Bus Stop, Ogudu/Oworonshoki Expressway.
+      </p>
+    ),
   },
   {
-    question: "What should I bring?",
+    question: "What are the times for the sessions?",
+    answer: (
+      <ul className="list-disc pl-5 space-y-2">
+        <li>
+          <strong className="text-slate-900">Wednesday (July 1st):</strong>{" "}
+          5:30 PM only (Opening Night Service)
+        </li>
+        <li>
+          <strong className="text-slate-900">
+            Thursday – Saturday (July 2nd – 4th):
+          </strong>
+          <ul className="list-[circle] pl-5 mt-2 space-y-1">
+            <li>Morning Sessions — 9:00 AM</li>
+            <li>Afternoon Sessions (Youth Conference) — 1:30 PM</li>
+            <li>Evening Sessions — 5:30 PM</li>
+          </ul>
+        </li>
+        <li>
+          <strong className="text-slate-900">Sunday (July 5th):</strong> 7:15
+          AM | 9:00 AM
+        </li>
+      </ul>
+    ),
+  },
+  {
+    question: "Is RC free, and is pre-registration required?",
+    answer: (
+      <p>
+        Attendance is free, we encourage{" "}
+        <strong className="text-slate-900">
+          registrations so that you can get reminders and updates about the
+          conference.
+        </strong>
+      </p>
+    ),
+  },
+  {
+    question:
+      "Are there any specialized sessions in Recharge Conference 2026?",
+    answer: (
+      <p>
+        Yes. All afternoon sessions from Thursday to Saturday have been
+        specialized and dedicated to the{" "}
+        <strong className="text-slate-900">Youth Conference</strong>.
+      </p>
+    ),
+  },
+  {
+    question: "Will I be able to get things to buy at RC 2026?",
+    answer: "Yes. Food vendors will be available throughout the conference.",
+  },
+  {
+    question: "Will parking space be available?",
     answer:
-      "Bring a Bible, a notebook, and an open heart. We recommend dressing casually and comfortably.",
+      "Yes. Parking will be available within the church premises and surrounding areas.",
+  },
+  {
+    question: "Will childcare be available?",
+    answer: "Yes. Childcare services will be provided at every session.",
+  },
+  {
+    question: "Will the conference be streamed live?",
+    answer: (
+      <div className="space-y-3">
+        <p>Yes. You can join via:</p>
+        <ul className="list-disc pl-5 space-y-1.5">
+          <li>Facebook</li>
+          <li>Instagram</li>
+          <li>YouTube</li>
+          <li>Mixlr</li>
+          <li>
+            Global Impact website:{" "}
+            <a
+              href="https://globalimpactng.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#dd7b30] underline hover:text-[#b86a2a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-1"
+            >
+              globalimpactng.org
+            </a>
+          </li>
+          <li>
+            TikTok —{" "}
+            <a
+              href="https://www.tiktok.com/@yemidavidsofficial"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#dd7b30] underline hover:text-[#b86a2a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-1"
+            >
+              yemidavidsofficial
+            </a>
+          </li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    question: "How can I follow the events on social media?",
+    answer: (
+      <ul className="list-disc pl-5 space-y-1.5">
+        <li>
+          Instagram:{" "}
+          <a
+            href="https://instagram.com/globalimpactng"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#dd7b30] underline hover:text-[#b86a2a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-1"
+          >
+            @globalimpactng
+          </a>{" "}
+          /{" "}
+          <a
+            href="https://instagram.com/rechargegic"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#dd7b30] underline hover:text-[#b86a2a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-1"
+          >
+            @rechargegic
+          </a>
+        </li>
+        <li>
+          YouTube:{" "}
+          <a
+            href="https://youtube.com/@globalimpactTV"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#dd7b30] underline hover:text-[#b86a2a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-1"
+          >
+            @globalimpactTV
+          </a>
+        </li>
+        <li>
+          Facebook:{" "}
+          <a
+            href="https://facebook.com/globalimpactng"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#dd7b30] underline hover:text-[#b86a2a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-1"
+          >
+            Global Impact NG
+          </a>
+        </li>
+        <li>
+          X —{" "}
+          <a
+            href="https://x.com/Global_ImpactNG"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#dd7b30] underline hover:text-[#b86a2a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-1"
+          >
+            Global_ImpactNG
+          </a>
+        </li>
+        <li>
+          TikTok —{" "}
+          <a
+            href="https://www.tiktok.com/@global.impact.church"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#dd7b30] underline hover:text-[#b86a2a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-1"
+          >
+            global.impact.church
+          </a>
+        </li>
+      </ul>
+    ),
   },
 ];
 
-const GALLERY = [
-  "https://picsum.photos/seed/conf1/800/600",
-  "https://picsum.photos/seed/conf2/800/600",
-  "https://picsum.photos/seed/conf3/800/600",
-  "https://picsum.photos/seed/conf4/800/600",
+// Highlights gallery — videos from Global Impact Church TV
+// (https://www.youtube.com/@GlobalImpactChurchTV). The first three entries
+// are verified live videos tagged "Recharge Conference 2022" on the channel.
+// To replace a "Coming Soon" tile with a real video, copy the 11-character
+// "v" parameter from any YouTube URL (e.g. for
+// https://www.youtube.com/watch?v=dQw4w9WgXcQ the id is "dQw4w9WgXcQ") and
+// set `available: true`.
+const GLOBAL_IMPACT_CHANNEL_URL =
+  "https://www.youtube.com/@GlobalImpactChurchTV";
+
+type GalleryVideo = {
+  id: string;
+  title: string;
+  speaker?: string;
+  available: boolean;
+};
+
+const VIDEO_GALLERY: GalleryVideo[] = [
+  {
+    id: "ICPR9LoJ3O0",
+    title: "Spontaneous Worship & Praise",
+    speaker: "Chioma Jesus",
+    available: true,
+  },
+  {
+    id: "UfDN6ch7Oh4",
+    title: "Extraordinary Praise & Worship",
+    speaker: "Judikay",
+    available: true,
+  },
+  {
+    id: "cDrcGItNevM",
+    title: "Building a Strong Family in God's Covenant",
+    speaker: "Pastor Yemi Davids",
+    available: true,
+  },
+  {
+    id: "COMING_SOON_04",
+    title: "Recharge 2026 Opening Night",
+    available: false,
+  },
+  {
+    id: "COMING_SOON_05",
+    title: "Youth Conference Highlights",
+    available: false,
+  },
+  {
+    id: "COMING_SOON_06",
+    title: "Sunday Services Recap",
+    available: false,
+  },
 ];
 
+// Placeholder partner hotels near The Goodland (Ogudu / Oworoshoki, Lagos).
+// Update names, contact numbers, and booking links with confirmed details.
 const HOTELS = [
   {
-    name: "The Grand Marquee",
+    name: "Goodland Suites",
     type: "Official Partner Hotel",
-    distance: "0 Miles from Venue",
+    distance: "On Venue Grounds",
     rateType: "Block Rate",
     bookingLink: "#",
     isPrimary: true,
-    amenities: ["Free Wi-Fi", "Pool", "Fitness Center", "Breakfast Included"],
-    contactNumber: "(555) 123-4567",
+    amenities: ["Free Wi-Fi", "Breakfast Included", "Shuttle to Sessions"],
+    contactNumber: "+234 (0) 800 000 0001",
   },
   {
-    name: "Riverside Suites",
+    name: "Ogudu GRA Residences",
+    type: "Recommended Hotel",
+    distance: "1.5 km from Venue",
+    rateType: "Conference Rate",
+    bookingLink: "#",
+    isPrimary: false,
+    amenities: ["Free Wi-Fi", "Restaurant", "24/7 Power"],
+    contactNumber: "+234 (0) 800 000 0002",
+  },
+  {
+    name: "Oworoshoki Express Inn",
     type: "Overflow Hotel",
-    distance: "2 Miles from Venue",
+    distance: "3 km from Venue",
     rateType: "Regular Rate",
     bookingLink: "#",
     isPrimary: false,
-    amenities: ["Free Wi-Fi", "Continental Breakfast", "Business Center"],
-    contactNumber: "(555) 987-6543",
+    amenities: ["Free Parking", "Continental Breakfast", "Airport Pickup"],
+    contactNumber: "+234 (0) 800 000 0003",
   },
   {
-    name: "Downtown Inn",
-    type: "Overflow Hotel",
-    distance: "3 Miles from Venue",
-    rateType: "Regular Rate",
-    bookingLink: "#",
-    isPrimary: false,
-    amenities: ["Free Parking", "Pet Friendly", "In-Room Kitchenette"],
-    contactNumber: "(555) 246-8101",
-  },
-  {
-    name: "Metropolis Boutique",
+    name: "Maryland Boutique Hotel",
     type: "Premium Hotel",
-    distance: "1 Mile from Venue",
+    distance: "6 km from Venue",
     rateType: "Regular Rate",
     bookingLink: "#",
     isPrimary: false,
-    amenities: ["Spa", "Valet Parking", "Rooftop Bar", "Fine Dining"],
-    contactNumber: "(555) 369-1478",
+    amenities: ["Spa", "Pool", "Fine Dining", "Valet Parking"],
+    contactNumber: "+234 (0) 800 000 0004",
   },
 ];
 
@@ -471,22 +676,33 @@ function About() {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-xs font-bold tracking-widest uppercase text-[#dd7b30] mb-4 border-l-2 border-[#dd7b30] pl-2">
-              About Recharge Conference 2026
+              About Recharge Conference
             </h2>
             <h3 className="text-4xl md:text-5xl font-black uppercase text-slate-900 leading-none mb-6 tracking-tight">
-              Kingdom
+              A Winning
               <br />
-              Greatness
+              Second Half
             </h3>
             <p className="text-sm font-mono text-slate-600 mb-6 leading-relaxed">
-              We live in a fast-paced world that constantly drains our energy.
-              Recharge Conference is designed as a sanctuary—a dedicated time to
-              disconnect from the noise and reconnect with God's presence.
+              Recharge Conference is Global Impact Church's annual mid-year
+              gathering for every believer and leader who knows the year isn't
+              over yet. For five powerful days, you will be immersed in moments
+              designed to reignite your spirit, sharpen your leadership, and
+              reposition you for a stronger second half of the year.
+            </p>
+            <p className="text-sm font-mono text-slate-600 mb-6 leading-relaxed">
+              By mid year, momentum slows, vision blurs, and fire dims.
+              Recharge exists for that exact moment, to pull you back to
+              clarity, purpose, and power. Each day is intentionally crafted to
+              move you through spiritual renewal and leadership sharpening, so
+              you don't just finish the year, you finish strong. You enter the
+              second half not depleted, but empowered.
             </p>
             <p className="text-sm font-mono text-slate-600 mb-8 leading-relaxed">
-              Whether you're a ministry leader, a volunteer, or someone just
-              looking to encounter God in a fresh way, these two days will equip
-              and inspire you for the journey ahead.
+              Convened by Pastor Yemi Davids and Pastor Bimbo Davids, Global
+              Lead Pastors of Global Impact Church, the unique voices God has
+              graced to lead this charge. One focus: a winning second half.
+              Come ready to be refuelled.
             </p>
 
             <div className="grid grid-cols-2 gap-8 border-t border-slate-200 pt-8">
@@ -495,15 +711,15 @@ function About() {
                   05
                 </div>
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                  Days of Divine Encounter
+                  Powerful Days
                 </div>
               </div>
               <div>
                 <div className="text-5xl font-black text-[#dd7b30] mb-1 leading-none">
-                  15<span className="text-3xl">+</span>
+                  01
                 </div>
                 <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                  Keynote Speakers
+                  Focus: A Winning Second Half
                 </div>
               </div>
             </div>
@@ -663,320 +879,136 @@ function Speakers() {
 }
 
 function Schedule() {
-  const [activeFilter, setActiveFilter] = useState("All");
-  const [feedbackEvent, setFeedbackEvent] = useState<{
-    title: string;
-    day: string;
-  } | null>(null);
-  const [feedbackStatus, setFeedbackStatus] = useState<"idle" | "success">(
-    "idle",
-  );
-  const [rating, setRating] = useState(0);
-
-  const FILTER_TABS = [
-    "All",
-    "Friday",
-    "Saturday",
-    "Keynote",
-    "Breakout",
-    "Worship",
-  ];
-
-  const handleFeedbackSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setFeedbackStatus("success");
-    setTimeout(() => {
-      setFeedbackStatus("idle");
-      setFeedbackEvent(null);
-      setRating(0);
-    }, 2000);
-  };
-
-  const filteredSchedule = SCHEDULE.map((day) => {
-    // 1. Day-level filtering
-    if (activeFilter === "Friday" && day.day !== "Friday") return null;
-    if (activeFilter === "Saturday" && day.day !== "Saturday") return null;
-
-    // 2. Type-level filtering
-    const filteredEvents = day.events.filter((event) => {
-      if (["All", "Friday", "Saturday"].includes(activeFilter)) return true;
-      return event.type === activeFilter;
-    });
-
-    if (filteredEvents.length === 0) return null;
-
-    return { ...day, events: filteredEvents };
-  }).filter((day): day is (typeof SCHEDULE)[number] => day !== null);
-
   return (
     <section
       id="schedule"
       className="py-24 bg-slate-50 border-b border-slate-200"
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 flex flex-col lg:flex-row justify-between items-center gap-6 text-center lg:text-left">
-          <div>
-            <h2 className="text-xs font-bold tracking-widest uppercase text-[#dd7b30] mb-2">
-              Itinerary
-            </h2>
-            <h3 className="text-4xl md:text-5xl font-black uppercase text-slate-900 leading-none tracking-tight">
-              Conference Schedule
-            </h3>
-          </div>
-
-          {/* Filters */}
-          <div className="flex flex-wrap items-center justify-center lg:justify-end gap-2 w-full lg:w-auto">
-            {FILTER_TABS.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveFilter(tab)}
-                aria-pressed={activeFilter === tab}
-                className={`px-4 py-2 border text-[10px] font-bold uppercase tracking-widest transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-1 ${activeFilter === tab ? "bg-[#dd7b30] border-[#dd7b30] text-white" : "bg-white border-slate-200 text-slate-500 hover:border-slate-400 hover:text-slate-900"}`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-12 text-center lg:text-left">
+          <h2 className="text-xs font-bold tracking-widest uppercase text-[#dd7b30] mb-2">
+            Itinerary
+          </h2>
+          <h3 className="text-4xl md:text-5xl font-black uppercase text-slate-900 leading-none tracking-tight">
+            Conference Schedule
+          </h3>
+          <p className="mt-4 font-mono text-xs text-slate-500 uppercase tracking-widest">
+            1 – 5 July 2026 • The Goodland, Ogudu, Lagos
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 items-start">
-          <AnimatePresence mode="popLayout">
-            {filteredSchedule.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="col-span-1 border border-slate-200 bg-white text-center py-12 text-slate-500 font-mono text-[11px] uppercase tracking-widest"
-              >
-                No sessions found for this filter.
-              </motion.div>
-            )}
-            {filteredSchedule.map((day, dIdx) => (
-              <motion.div
-                key={day.day}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
-                className="bg-white border border-slate-200 flex flex-col h-fit"
-              >
-                <div className="p-6 border-b border-slate-200 bg-slate-100 flex justify-between items-center">
-                  <h4 className="text-sm font-black uppercase tracking-widest text-slate-900">
-                    {day.day}
-                  </h4>
-                  <span className="text-[10px] text-[#dd7b30] font-bold uppercase tracking-widest border border-[#dd7b30]/200 bg-white px-3 py-1">
+        <ol className="border-l-2 border-[#dd7b30]/30 pl-6 sm:pl-10 space-y-10">
+          {SCHEDULE.map((day, idx) => (
+            <motion.li
+              key={day.day}
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.4, delay: idx * 0.05 }}
+              className="relative"
+            >
+              <span
+                aria-hidden="true"
+                className="absolute -left-[34px] sm:-left-[50px] top-1 w-4 h-4 bg-[#dd7b30] border-4 border-slate-50 rounded-full"
+              ></span>
+
+              <div className="bg-white border border-slate-200">
+                <div className="px-6 py-4 border-b border-slate-200 bg-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#dd7b30]">
+                      {day.label}
+                    </p>
+                    <h4 className="text-lg sm:text-xl font-black uppercase text-slate-900 tracking-tight">
+                      {day.day}
+                    </h4>
+                  </div>
+                  <span className="self-start sm:self-auto text-[10px] font-bold uppercase tracking-widest text-slate-700 border border-slate-300 bg-white px-3 py-1">
                     {day.date}
                   </span>
                 </div>
 
-                <div className="p-6 space-y-4 font-mono text-[11px] overflow-hidden">
-                  <AnimatePresence>
-                    {day.events.map((evt, eIdx) => (
-                      <motion.div
-                        key={`${day.day}-${evt.title}-${evt.time}`}
-                        layout
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                        className="grid grid-cols-4 border-b border-slate-100 pb-3 last:border-0 last:pb-0 group"
-                      >
-                        <span className="text-[#dd7b30] font-bold col-span-1">
-                          {evt.time}
-                        </span>
-                        <div className="col-span-3 flex flex-col items-start">
-                          <span className="uppercase font-bold text-slate-900 block mb-1 group-hover:text-[#dd7b30] transition-colors">
-                            {evt.title}
-                            <span className="ml-2 inline-block px-1.5 py-0.5 border border-slate-200 text-[9px] text-slate-500 leading-none align-middle group-hover:border-indigo-200 group-hover:text-indigo-500 transition-colors">
-                              {evt.type}
-                            </span>
-                          </span>
-                          <span className="text-slate-500 hidden sm:block">
-                            {evt.description}
-                          </span>
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            <button
-                              onClick={() =>
-                                setFeedbackEvent({
-                                  title: evt.title,
-                                  day: day.day,
-                                })
-                              }
-                              className="text-[9px] font-bold uppercase tracking-widest text-[#dd7b30] hover:text-[#b86a2a] transition-colors flex items-center gap-1 border border-[#dd7b30] hover:border-[#b86a2a] px-2 py-1 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30]"
-                            >
-                              <MessageSquare size={10} /> Rate Session
-                            </button>
-                            <button
-                              onClick={() => {
-                                const text = `I'm attending the "${evt.title}" session on ${day.day} at the Recharge Conference!`;
-                                const url = "https://rechargeconf.org";
-                                window.open(
-                                  `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
-                                  "_blank",
-                                );
-                              }}
-                              className="text-[9px] font-bold uppercase tracking-widest text-slate-500 hover:text-blue-400 transition-colors flex items-center gap-1 border border-slate-200 hover:border-blue-200 px-2 py-1 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-                            >
-                              <Twitter size={10} /> Share
-                            </button>
-                            <button
-                              onClick={() => {
-                                const url = "https://rechargeconf.org";
-                                const text = `I'm attending the "${evt.title}" session on ${day.day} at the Recharge Conference!`;
-                                window.open(
-                                  `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`,
-                                  "_blank",
-                                );
-                              }}
-                              className="text-[9px] font-bold uppercase tracking-widest text-slate-500 hover:text-blue-600 transition-colors flex items-center gap-1 border border-slate-200 hover:border-blue-300 px-2 py-1 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
-                            >
-                              <Facebook size={10} /> Share
-                            </button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {feedbackEvent && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-100 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 md:p-8"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="feedback-title"
-          >
-            {/* Overlay */}
-            <div
-              className="absolute inset-0"
-              onClick={() => setFeedbackEvent(null)}
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white border border-slate-200 w-full max-w-md shadow-2xl relative z-10"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="p-6 border-b border-slate-100 flex justify-between items-start">
-                <div>
-                  <h3
-                    id="feedback-title"
-                    className="text-xl font-black uppercase text-slate-900 tracking-tight mb-1"
-                  >
-                    Session Feedback
-                  </h3>
-                  <p className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">
-                    {feedbackEvent.day} • {feedbackEvent.title}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setFeedbackEvent(null)}
-                  className="text-slate-500 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
-                  aria-label="Close feedback modal"
-                >
-                  <span className="text-lg font-bold">&times;</span>
-                </button>
-              </div>
-
-              {feedbackStatus === "success" ? (
-                <div
-                  className="p-8 flex flex-col items-center text-center justify-center min-h-62.5"
-                  aria-live="polite"
-                >
-                  <h4 className="text-lg font-bold uppercase tracking-tight text-indigo-600 mb-2">
-                    Thank You!
-                  </h4>
-                  <p className="text-xs font-mono text-slate-500">
-                    Your feedback helps us improve.
-                  </p>
-                </div>
-              ) : (
-                <form onSubmit={handleFeedbackSubmit} className="p-6 space-y-6">
-                  <fieldset>
-                    <legend className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-3">
-                      Rate your experience
-                    </legend>
-                    <div className="flex gap-2">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          type="button"
-                          key={star}
-                          onClick={() => setRating(star)}
-                          aria-label={`${star} star${star > 1 ? "s" : ""}`}
-                          aria-pressed={rating >= star}
-                          className={`p-2 border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 ${rating >= star ? "bg-indigo-50 border-indigo-600 text-indigo-600" : "border-slate-200 text-slate-300 hover:text-indigo-400 hover:border-indigo-200"}`}
-                        >
-                          <Star
-                            size={24}
-                            className={rating >= star ? "fill-indigo-600" : ""}
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </fieldset>
-
-                  <div>
-                    <label
-                      htmlFor="feedbackComments"
-                      className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2"
+                <ul className="divide-y divide-slate-100">
+                  {day.events.map((evt) => (
+                    <li
+                      key={`${day.day}-${evt.title}-${evt.time}`}
+                      className="px-6 py-4 grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 sm:gap-6 items-baseline font-mono text-[12px]"
                     >
-                      Comments (Optional)
-                    </label>
-                    <textarea
-                      id="feedbackComments"
-                      rows={3}
-                      placeholder="What were your key takeaways?"
-                      className="w-full bg-slate-50 border border-slate-200 p-3 text-xs font-mono focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 resize-none"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={rating === 0}
-                    className="w-full bg-slate-900 text-white py-3 text-xs font-bold uppercase tracking-tighter hover:bg-indigo-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Submit Feedback
-                  </button>
-                </form>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                      <span className="text-[#dd7b30] font-bold tracking-wider">
+                        {evt.time}
+                      </span>
+                      <span className="flex flex-wrap items-center gap-x-3 gap-y-1 uppercase font-bold text-slate-900 tracking-tight">
+                        {evt.title}
+                        {evt.tag && (
+                          <span className="inline-block px-2 py-0.5 border border-[#dd7b30] text-[9px] text-[#dd7b30] leading-none tracking-widest">
+                            {evt.tag}
+                          </span>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </motion.li>
+          ))}
+        </ol>
+      </div>
     </section>
   );
 }
 
 function Gallery() {
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
-    null,
-  );
+  const playableVideos = VIDEO_GALLERY.filter((v) => v.available);
+  const [selectedPlayableIndex, setSelectedPlayableIndex] = useState<
+    number | null
+  >(null);
+
+  const openVideo = (video: GalleryVideo) => {
+    if (!video.available) return;
+    const idx = playableVideos.findIndex((v) => v.id === video.id);
+    if (idx !== -1) setSelectedPlayableIndex(idx);
+  };
 
   const handleNext = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (selectedImageIndex !== null) {
-      setSelectedImageIndex((selectedImageIndex + 1) % GALLERY.length);
+    if (selectedPlayableIndex !== null) {
+      setSelectedPlayableIndex(
+        (selectedPlayableIndex + 1) % playableVideos.length,
+      );
     }
   };
 
   const handlePrev = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (selectedImageIndex !== null) {
-      setSelectedImageIndex(
-        (selectedImageIndex - 1 + GALLERY.length) % GALLERY.length,
+    if (selectedPlayableIndex !== null) {
+      setSelectedPlayableIndex(
+        (selectedPlayableIndex - 1 + playableVideos.length) %
+          playableVideos.length,
       );
     }
   };
+
+  useEffect(() => {
+    if (selectedPlayableIndex === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedPlayableIndex(null);
+      if (e.key === "ArrowRight")
+        setSelectedPlayableIndex(
+          (i) => ((i ?? 0) + 1) % playableVideos.length,
+        );
+      if (e.key === "ArrowLeft")
+        setSelectedPlayableIndex(
+          (i) =>
+            ((i ?? 0) - 1 + playableVideos.length) % playableVideos.length,
+        );
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedPlayableIndex, playableVideos.length]);
+
+  const activeVideo =
+    selectedPlayableIndex !== null
+      ? playableVideos[selectedPlayableIndex]
+      : null;
 
   return (
     <section
@@ -984,7 +1016,7 @@ function Gallery() {
       className="py-24 bg-slate-900 text-white border-b border-slate-800"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-end mb-12 border-b border-slate-800 pb-6">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6 mb-12 border-b border-slate-800 pb-6">
           <div>
             <h2 className="text-xs font-bold tracking-widest uppercase text-[#dd7b30] mb-2">
               Past Events
@@ -993,42 +1025,120 @@ function Gallery() {
               Recharge Highlights
             </h3>
           </div>
+          <a
+            href={GLOBAL_IMPACT_CHANNEL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 self-start md:self-auto border-2 border-[#dd7b30] text-[#dd7b30] px-5 py-3 text-[11px] font-black uppercase tracking-widest hover:bg-[#dd7b30] hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+          >
+            <Youtube size={16} />
+            Watch More on YouTube
+          </a>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {GALLERY.map((img, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
-              onClick={() => setSelectedImageIndex(idx)}
-              className={`border border-slate-700 bg-slate-800 overflow-hidden relative group cursor-pointer ${idx === 0 || idx === 3 ? "col-span-2 aspect-video" : "col-span-2 md:col-span-1 aspect-square"} focus-within:ring-2 focus-within:ring-[#dd7b30]`}
-            >
-              <button
-                className="absolute inset-0 w-full h-full opacity-0 focus:opacity-100 sr-only md:not-sr-only md:opacity-0 focus:outline-none"
-                aria-label={`View gallery image ${idx + 1} larger`}
-              />
-              <img
-                src={img}
-                alt={`Conference moment ${idx + 1}`}
-                className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700"
-                referrerPolicy="no-referrer"
-              />
-              <div
-                aria-hidden="true"
-                className="absolute top-4 left-4 border border-white/20 bg-black/50 backdrop-blur-sm px-2 py-1 text-[9px] font-mono uppercase tracking-widest group-hover:bg-[#dd7b30] transition-colors"
+          {VIDEO_GALLERY.map((video, idx) => {
+            const isWide = idx === 0 || idx === 3;
+            const tileSize = isWide
+              ? "col-span-2 aspect-video"
+              : "col-span-2 md:col-span-1 aspect-square";
+
+            if (!video.available) {
+              return (
+                <motion.div
+                  key={`${video.id}-${idx}`}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  className={`border border-dashed border-slate-700 bg-slate-800/40 relative overflow-hidden flex flex-col items-center justify-center text-center p-6 ${tileSize}`}
+                  aria-label={`Coming soon: ${video.title}`}
+                >
+                  <span className="absolute top-4 left-4 border border-white/10 bg-black/40 backdrop-blur-sm px-2 py-1 text-[9px] font-mono uppercase tracking-widest text-slate-400">
+                    Coming Soon
+                  </span>
+                  <Youtube size={28} className="text-slate-600 mb-3" />
+                  <p className="font-bold uppercase text-xs sm:text-sm tracking-tight text-slate-300 line-clamp-2">
+                    {video.title}
+                  </p>
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-slate-500 mt-2">
+                    Highlights to be added
+                  </p>
+                </motion.div>
+              );
+            }
+
+            return (
+              <motion.button
+                type="button"
+                key={`${video.id}-${idx}`}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                onClick={() => openVideo(video)}
+                aria-label={`Play video: ${video.title}${
+                  video.speaker ? ` by ${video.speaker}` : ""
+                }`}
+                className={`border border-slate-700 bg-slate-800 overflow-hidden relative group cursor-pointer text-left ${tileSize} focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30]`}
               >
-                Capture 0{idx + 1}
-              </div>
-            </motion.div>
-          ))}
+                <img
+                  src={`https://img.youtube.com/vi/${video.id}/maxresdefault.jpg`}
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  onError={(e) => {
+                    const img = e.currentTarget;
+                    if (img.dataset.fallback !== "1") {
+                      img.dataset.fallback = "1";
+                      img.src = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
+                    } else {
+                      img.style.display = "none";
+                    }
+                  }}
+                  className="absolute inset-0 w-full h-full object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700"
+                  referrerPolicy="no-referrer"
+                />
+
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 pointer-events-none"
+                />
+
+                <span
+                  aria-hidden="true"
+                  className="absolute top-4 left-4 border border-white/20 bg-black/50 backdrop-blur-sm px-2 py-1 text-[9px] font-mono uppercase tracking-widest group-hover:bg-[#dd7b30] transition-colors"
+                >
+                  Highlight 0{idx + 1}
+                </span>
+
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 flex items-center justify-center"
+                >
+                  <span className="w-14 h-14 md:w-16 md:h-16 border-2 border-white/80 bg-black/40 backdrop-blur-sm flex items-center justify-center rounded-full group-hover:bg-[#dd7b30] group-hover:border-[#dd7b30] transition-colors">
+                    <Play size={24} className="text-white translate-x-0.5" />
+                  </span>
+                </span>
+
+                <div className="absolute bottom-4 left-4 right-4">
+                  {video.speaker && (
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-[#dd7b30] mb-1">
+                      {video.speaker}
+                    </p>
+                  )}
+                  <p className="font-bold uppercase text-xs sm:text-sm tracking-tight line-clamp-2 text-white">
+                    {video.title}
+                  </p>
+                </div>
+              </motion.button>
+            );
+          })}
         </div>
       </div>
 
       <AnimatePresence>
-        {selectedImageIndex !== null && (
+        {activeVideo && selectedPlayableIndex !== null && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1036,57 +1146,68 @@ function Gallery() {
             className="fixed inset-0 z-100 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 md:p-8"
             role="dialog"
             aria-modal="true"
-            aria-label="Image gallery fullscreen view"
+            aria-label={`Video: ${activeVideo.title}`}
           >
             {/* Overlay click handler */}
             <div
               className="absolute inset-0"
-              onClick={() => setSelectedImageIndex(null)}
+              onClick={() => setSelectedPlayableIndex(null)}
             />
 
             <button
-              onClick={() => setSelectedImageIndex(null)}
-              className="absolute top-6 right-6 text-white hover:text-indigo-400 transition-colors z-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
-              aria-label="Close gallery"
+              onClick={() => setSelectedPlayableIndex(null)}
+              className="absolute top-6 right-6 text-white hover:text-[#dd7b30] transition-colors z-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30]"
+              aria-label="Close video"
             >
               <X size={32} />
             </button>
 
-            <div className="relative w-full max-w-5xl aspect-video flex items-center justify-center z-10">
-              <motion.img
-                key={selectedImageIndex}
-                initial={{ opacity: 0, scale: 0.95 }}
+            <div className="relative w-full max-w-5xl aspect-video z-10">
+              <motion.div
+                key={activeVideo.id}
+                initial={{ opacity: 0, scale: 0.97 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
+                exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ duration: 0.2 }}
-                src={GALLERY[selectedImageIndex]}
-                alt={`Enlarged gallery photo ${selectedImageIndex + 1}`}
-                className="max-w-full max-h-full object-contain border border-slate-700"
+                className="w-full h-full bg-black border border-slate-700"
                 onClick={(e) => e.stopPropagation()}
-                referrerPolicy="no-referrer"
-              />
-
-              <button
-                onClick={handlePrev}
-                aria-label="Previous image"
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-indigo-600 text-white p-3 rounded-full backdrop-blur-md transition-colors border border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
               >
-                <ChevronLeft size={24} />
-              </button>
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${activeVideo.id}?autoplay=1&rel=0`}
+                  title={activeVideo.title}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                  style={{ border: 0 }}
+                />
+              </motion.div>
 
-              <button
-                onClick={handleNext}
-                aria-label="Next image"
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-indigo-600 text-white p-3 rounded-full backdrop-blur-md transition-colors border border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
-              >
-                <ChevronRight size={24} />
-              </button>
+              {playableVideos.length > 1 && (
+                <>
+                  <button
+                    onClick={handlePrev}
+                    aria-label="Previous video"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-[#dd7b30] text-white p-3 rounded-full backdrop-blur-md transition-colors border border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30]"
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
+
+                  <button
+                    onClick={handleNext}
+                    aria-label="Next video"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-[#dd7b30] text-white p-3 rounded-full backdrop-blur-md transition-colors border border-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30]"
+                  >
+                    <ChevronRight size={24} />
+                  </button>
+                </>
+              )}
 
               <div
-                className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-md px-4 py-2 font-mono text-xs uppercase tracking-widest text-white border border-white/20 rounded-full"
+                className="absolute -bottom-12 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-md px-4 py-2 font-mono text-xs uppercase tracking-widest text-white border border-white/20 rounded-full whitespace-nowrap"
                 aria-live="polite"
               >
-                {selectedImageIndex + 1} / {GALLERY.length}
+                {selectedPlayableIndex + 1} / {playableVideos.length}
               </div>
             </div>
           </motion.div>
@@ -1096,14 +1217,36 @@ function Gallery() {
   );
 }
 
+type AttendeeType =
+  | "General Attendee"
+  | "Ministry Leader"
+  | "Worship Team"
+  | "Volunteer";
+type ChildcareOption = "No" | "Yes, 1 child" | "Yes, 2 children";
+
 function RegistrationAndHotel() {
-  const [formStatus, setFormStatus] = useState<"idle" | "success">("idle");
+  const [formStatus, setFormStatus] = useState<
+    "idle" | "submitting" | "success"
+  >("idle");
+  const [formError, setFormError] = useState<string | null>(null);
   const [currentHotelPage, setCurrentHotelPage] = useState(0);
   const [expandedHotelName, setExpandedHotelName] = useState<string | null>(
     null,
   );
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [organization, setOrganization] = useState("");
+  const [attendeeType, setAttendeeType] =
+    useState<AttendeeType>("General Attendee");
+  const [childcare, setChildcare] = useState<ChildcareOption>("No");
+
+  const hasConvex = Boolean(import.meta.env.VITE_CONVEX_URL);
+  const register = useMutation(api.registrations.register);
+  const registeredCount = useQuery(
+    api.registrations.count,
+    hasConvex ? {} : "skip",
+  );
 
   const itemsPerPage = 2;
   const totalHotelPages = Math.ceil(HOTELS.length / itemsPerPage);
@@ -1122,16 +1265,54 @@ function RegistrationAndHotel() {
     (currentHotelPage + 1) * itemsPerPage,
   );
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormStatus("success");
-    // Mocks successful submission
-    setTimeout(() => {
+    if (formStatus === "submitting") return;
+    setFormError(null);
+    setFormStatus("submitting");
+    const formEl = e.target as HTMLFormElement;
+
+    const resetAfterSuccess = () => {
       setFormStatus("idle");
       setFirstName("");
       setLastName("");
-      (e.target as HTMLFormElement).reset();
-    }, 8000); // Increased timeout so they have time to download the badge
+      setEmail("");
+      setOrganization("");
+      setAttendeeType("General Attendee");
+      setChildcare("No");
+      formEl.reset();
+    };
+
+    if (!hasConvex) {
+      // Convex isn't configured yet — fall back to the original mock flow so
+      // the site stays usable while the backend is being provisioned.
+      setFormStatus("success");
+      setTimeout(resetAfterSuccess, 8000);
+      return;
+    }
+
+    try {
+      await register({
+        firstName,
+        lastName,
+        email,
+        organization: organization.trim() ? organization : undefined,
+        attendeeType,
+        childcare,
+      });
+      setFormStatus("success");
+      setTimeout(resetAfterSuccess, 8000); // Time to download the badge
+    } catch (err) {
+      const message =
+        err instanceof ConvexError &&
+        typeof err.data === "object" &&
+        err.data !== null &&
+        "message" in err.data
+          ? String((err.data as { message: unknown }).message)
+          : "Something went wrong. Please try again.";
+      setFormError(message);
+      setFormStatus("idle");
+    }
   };
 
   const downloadBadge = () => {
@@ -1215,10 +1396,29 @@ function RegistrationAndHotel() {
             <h3 className="text-4xl font-black uppercase text-slate-900 leading-none tracking-tight mb-6">
               Reserve Your Seat
             </h3>
-            <p className="text-sm font-mono text-slate-600 mb-10 leading-relaxed">
+            <p className="text-sm font-mono text-slate-600 mb-6 leading-relaxed">
               Registration is completely free, but space is limited. Please let
               us know you're coming so we can prepare for you!
             </p>
+
+            {hasConvex && (
+              <div
+                className="mb-10 inline-flex items-center gap-3 self-start border border-slate-200 bg-slate-50 px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-slate-700"
+                aria-live="polite"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#dd7b30] opacity-75"></span>
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#dd7b30]"></span>
+                </span>
+                <span>
+                  {registeredCount === undefined
+                    ? "Loading attendees…"
+                    : `${registeredCount.toLocaleString()} ${
+                        registeredCount === 1 ? "person" : "people"
+                      } registered`}
+                </span>
+              </div>
+            )}
 
             <div className="bg-slate-50 border border-slate-200 p-6 flex flex-col justify-between mt-auto">
               <div>
@@ -1426,6 +1626,8 @@ function RegistrationAndHotel() {
                         type="email"
                         placeholder="john@example.com"
                         className="bg-slate-50 w-full focus:outline-none focus:ring-2 focus:ring-[#dd7b30] focus:border-transparent px-3 py-2"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                       />
                     </div>
 
@@ -1441,6 +1643,8 @@ function RegistrationAndHotel() {
                         type="text"
                         placeholder="City Church"
                         className="bg-slate-50 w-full focus:outline-none focus:ring-2 focus:ring-[#dd7b30] focus:border-transparent px-3 py-2"
+                        value={organization}
+                        onChange={(e) => setOrganization(e.target.value)}
                       />
                     </div>
 
@@ -1455,6 +1659,10 @@ function RegistrationAndHotel() {
                         <select
                           id="regType"
                           className="bg-slate-50 w-full focus:outline-none focus:ring-2 focus:ring-[#dd7b30] focus:border-transparent px-3 py-2"
+                          value={attendeeType}
+                          onChange={(e) =>
+                            setAttendeeType(e.target.value as AttendeeType)
+                          }
                         >
                           <option>General Attendee</option>
                           <option>Ministry Leader</option>
@@ -1472,6 +1680,10 @@ function RegistrationAndHotel() {
                         <select
                           id="regChildcare"
                           className="bg-slate-50 w-full focus:outline-none focus:ring-2 focus:ring-[#dd7b30] focus:border-transparent px-3 py-2"
+                          value={childcare}
+                          onChange={(e) =>
+                            setChildcare(e.target.value as ChildcareOption)
+                          }
                         >
                           <option>No</option>
                           <option>Yes, 1 child</option>
@@ -1480,11 +1692,24 @@ function RegistrationAndHotel() {
                       </div>
                     </div>
 
+                    {formError && (
+                      <div
+                        role="alert"
+                        className="border border-red-200 bg-red-50 text-red-700 px-3 py-2 text-xs font-mono"
+                      >
+                        {formError}
+                      </div>
+                    )}
+
                     <button
                       type="submit"
-                      className="btn-primary w-full mt-4 flex items-center justify-center gap-2"
+                      disabled={formStatus === "submitting"}
+                      className="btn-primary w-full mt-4 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                      Complete Registration <ArrowRight size={14} />
+                      {formStatus === "submitting"
+                        ? "Reserving Your Seat…"
+                        : "Complete Registration"}{" "}
+                      <ArrowRight size={14} />
                     </button>
                   </form>
                 )}
@@ -1562,7 +1787,7 @@ function FaqAndContact() {
                           exit={{ height: 0, opacity: 0 }}
                           className="overflow-hidden bg-slate-50"
                         >
-                          <div className="p-6 pt-0 font-mono text-[11px] text-slate-600 leading-relaxed border-t border-slate-200 mt-2">
+                          <div className="p-6 pt-0 font-mono text-sm text-slate-600 leading-relaxed border-t border-slate-200 mt-2">
                             {faq.answer}
                           </div>
                         </motion.div>
@@ -1640,6 +1865,35 @@ function FaqAndContact() {
                   {contactStatus === "sent" ? "Message Sent" : "Submit"}
                 </button>
               </form>
+            </div>
+
+            {/* Venue Map */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3 pb-3 border-b border-white/30">
+                <h4 className="text-xs font-bold uppercase tracking-widest flex items-center gap-2">
+                  <MapPin size={14} /> Find Us
+                </h4>
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=The+Goodland+Ifako+Bus+Stop+Ogudu+Oworoshoki+Expressway+Lagos"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] font-bold uppercase tracking-widest text-white underline hover:text-white/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                >
+                  Get Directions →
+                </a>
+              </div>
+              <div className="aspect-video border-2 border-white/30 overflow-hidden bg-indigo-950/30">
+                <iframe
+                  src="https://www.google.com/maps?q=The+Goodland+Ifako+Bus+Stop+Ogudu+Oworoshoki+Expressway+Lagos&output=embed"
+                  title="The Goodland venue location on Google Maps"
+                  width="100%"
+                  height="100%"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                  style={{ border: 0, display: "block" }}
+                />
+              </div>
             </div>
 
             <div className="bg-indigo-950/50 border border-[#dd7b30] p-4 font-mono text-[10px] text-white">
