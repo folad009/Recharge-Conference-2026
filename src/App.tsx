@@ -475,7 +475,7 @@ function Navbar() {
           </a>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium uppercase tracking-widest text-slate-500">
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium uppercase tracking-widest text-white">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.name}
@@ -603,14 +603,14 @@ function Hero() {
             <br />
             <span className="text-[#dd7b30]">Greatness</span>
           </h1>
-          <div className="mt-8 flex flex-col sm:flex-row gap-6 items-center justify-center text-base md:text-lg font-mono border-y-2 border-[#dd7b30] py-4 mb-10">
+          <div className="mt-8 flex flex-col sm:flex-row gap-6 items-center justify-center text-base md:text-[15px] uppercase font-mono border-y-2 border-[#dd7b30] py-4 mb-10">
             <div className="flex items-center gap-2">
-              <span className="opacity-60 text-[#dd7b30]">Date:</span> July 1st
-              - 5th, 2026
+              <span className="text-[#dd7b30]">Date:</span>Wednesday, July 1st
+              - Sunday, July 5th, 2026
             </div>
             <div className="hidden sm:block text-[#dd7b30]">/</div>
             <div className="flex items-center gap-2">
-              <span className="opacity-60 text-[#dd7b30]">Location:</span> The
+              <span className="text-[#dd7b30]">Location:</span> The
               Goodland - Ifako Bus Stop, Ogudu, <br />
               Oworoshoki Expressway, Lagos{" "}
             </div>
@@ -893,7 +893,7 @@ function Schedule() {
             Conference Schedule
           </h3>
           <p className="mt-4 font-mono text-xs text-slate-500 uppercase tracking-widest">
-            1 – 5 July 2026 • The Goodland, Ogudu, Lagos
+            Wednesday, 1st - Sunday, 5th July 2026 • The Goodland, Ogudu, Lagos
           </p>
         </div>
 
@@ -1222,7 +1222,7 @@ type AttendeeType =
   | "Ministry Leader"
   | "Worship Team"
   | "Volunteer";
-type ChildcareOption = "No" | "Yes, 1 child" | "Yes, 2 children";
+type ChildcareOption = "No" | "Yes";
 
 function RegistrationAndHotel() {
   const [formStatus, setFormStatus] = useState<
@@ -1236,6 +1236,7 @@ function RegistrationAndHotel() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [organization, setOrganization] = useState("");
   const [attendeeType, setAttendeeType] =
     useState<AttendeeType>("General Attendee");
@@ -1277,6 +1278,7 @@ function RegistrationAndHotel() {
       setFirstName("");
       setLastName("");
       setEmail("");
+      setPhone("");
       setOrganization("");
       setAttendeeType("General Attendee");
       setChildcare("No");
@@ -1296,6 +1298,7 @@ function RegistrationAndHotel() {
         firstName,
         lastName,
         email,
+        phone,
         organization: organization.trim() ? organization : undefined,
         attendeeType,
         childcare,
@@ -1615,6 +1618,24 @@ function RegistrationAndHotel() {
 
                     <div className="space-y-2">
                       <label
+                        htmlFor="regPhone"
+                        className="text-[10px] font-bold uppercase tracking-widest text-slate-500"
+                      >
+                        Phone Number *
+                      </label>
+                      <input
+                        id="regPhone"
+                        required
+                        type="tel"
+                        placeholder="08012345678"
+                        className="bg-slate-50 w-full focus:outline-none focus:ring-2 focus:ring-[#dd7b30] focus:border-transparent px-3 py-2"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label
                         htmlFor="regEmail"
                         className="text-[10px] font-bold uppercase tracking-widest text-slate-500"
                       >
@@ -1686,8 +1707,7 @@ function RegistrationAndHotel() {
                           }
                         >
                           <option>No</option>
-                          <option>Yes, 1 child</option>
-                          <option>Yes, 2 children</option>
+                          <option>Yes</option>
                         </select>
                       </div>
                     </div>

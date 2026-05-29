@@ -6,6 +6,7 @@ export default defineSchema({
     firstName: v.string(),
     lastName: v.string(),
     email: v.string(),
+    phone: v.optional(v.string()),
     organization: v.optional(v.string()),
     attendeeType: v.union(
       v.literal("General Attendee"),
@@ -13,11 +14,7 @@ export default defineSchema({
       v.literal("Worship Team"),
       v.literal("Volunteer"),
     ),
-    childcare: v.union(
-      v.literal("No"),
-      v.literal("Yes, 1 child"),
-      v.literal("Yes, 2 children"),
-    ),
+    childcare: v.union(v.literal("No"), v.literal("Yes")),
     registeredAt: v.number(),
   })
     .index("by_email", ["email"])

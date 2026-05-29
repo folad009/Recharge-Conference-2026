@@ -9,11 +9,7 @@ const attendeeTypeValidator = v.union(
   v.literal("Volunteer"),
 );
 
-const childcareValidator = v.union(
-  v.literal("No"),
-  v.literal("Yes, 1 child"),
-  v.literal("Yes, 2 children"),
-);
+const childcareValidator = v.union(v.literal("No"), v.literal("Yes"));
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -27,13 +23,14 @@ async function insertRegistration(
     firstName: string;
     lastName: string;
     email: string;
+    phone?: string;
     organization?: string;
     attendeeType:
       | "General Attendee"
       | "Ministry Leader"
       | "Worship Team"
       | "Volunteer";
-    childcare: "No" | "Yes, 1 child" | "Yes, 2 children";
+    childcare: "No" | "Yes";
   },
 ): Promise<Id<"registrations">> {
   const email = normalizeEmail(args.email);
@@ -60,6 +57,7 @@ async function insertRegistration(
     firstName: args.firstName.trim(),
     lastName: args.lastName.trim(),
     email,
+    phone: args.phone?.trim() || undefined,
     organization: args.organization?.trim() || undefined,
     attendeeType: args.attendeeType,
     childcare: args.childcare,
@@ -72,6 +70,7 @@ export const register = mutation({
     firstName: v.string(),
     lastName: v.string(),
     email: v.string(),
+    phone: v.optional(v.string()),
     organization: v.optional(v.string()),
     attendeeType: attendeeTypeValidator,
     childcare: childcareValidator,
