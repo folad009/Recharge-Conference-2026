@@ -14,6 +14,7 @@ export default defineSchema({
       v.literal("Worship Team"),
       v.literal("Volunteer"),
     ),
+    department: v.optional(v.string()),
     childcare: v.union(v.literal("No"), v.literal("Yes")),
     registeredAt: v.number(),
   })

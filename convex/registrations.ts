@@ -30,6 +30,7 @@ async function insertRegistration(
       | "Ministry Leader"
       | "Worship Team"
       | "Volunteer";
+    department?: string;
     childcare: "No" | "Yes";
   },
 ): Promise<Id<"registrations">> {
@@ -60,6 +61,10 @@ async function insertRegistration(
     phone: args.phone?.trim() || undefined,
     organization: args.organization?.trim() || undefined,
     attendeeType: args.attendeeType,
+    department:
+      args.attendeeType === "Volunteer"
+        ? args.department?.trim() || undefined
+        : undefined,
     childcare: args.childcare,
     registeredAt: Date.now(),
   });
@@ -73,6 +78,7 @@ export const register = mutation({
     phone: v.optional(v.string()),
     organization: v.optional(v.string()),
     attendeeType: attendeeTypeValidator,
+    department: v.optional(v.string()),
     childcare: childcareValidator,
   },
   returns: v.id("registrations"),

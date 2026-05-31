@@ -166,7 +166,7 @@ const FAQS: { question: string; answer: React.ReactNode }[] = [
       <p>
         RC 2026 holds from{" "}
         <strong className="text-slate-900">
-          July 1st to July 5th, 2026
+          Wednesday, July 1st to Sunday, July 5th, 2026
         </strong>
         .
       </p>
@@ -1224,6 +1224,19 @@ type AttendeeType =
   | "Volunteer";
 type ChildcareOption = "No" | "Yes";
 
+const VOLUNTEER_DEPARTMENTS = [
+  "Ushering & Welcome",
+  "Registration & Check-in",
+  "Media & Technical",
+  "Worship & Music",
+  "Hospitality & Catering",
+  "Children's Ministry",
+  "Security & Logistics",
+  "Prayer & Counseling",
+  "Sanitation",
+  "Other",
+] as const;
+
 function RegistrationAndHotel() {
   const [formStatus, setFormStatus] = useState<
     "idle" | "submitting" | "success"
@@ -1240,6 +1253,7 @@ function RegistrationAndHotel() {
   const [organization, setOrganization] = useState("");
   const [attendeeType, setAttendeeType] =
     useState<AttendeeType>("General Attendee");
+  const [department, setDepartment] = useState("");
   const [childcare, setChildcare] = useState<ChildcareOption>("No");
 
   const hasConvex = Boolean(import.meta.env.VITE_CONVEX_URL);
@@ -1281,6 +1295,7 @@ function RegistrationAndHotel() {
       setPhone("");
       setOrganization("");
       setAttendeeType("General Attendee");
+      setDepartment("");
       setChildcare("No");
       formEl.reset();
     };
@@ -1301,6 +1316,10 @@ function RegistrationAndHotel() {
         phone,
         organization: organization.trim() ? organization : undefined,
         attendeeType,
+        department:
+          attendeeType === "Volunteer" && department.trim()
+            ? department
+            : undefined,
         childcare,
       });
       setFormStatus("success");
@@ -1373,7 +1392,7 @@ function RegistrationAndHotel() {
 
     // Dates & Location
     ctx.fillStyle = "#94a3b8"; // slate-400
-    ctx.font = "20px monospace";
+    ctx.font = "15px monospace";
     ctx.fillText("JULY 1st - 5th, 2026", canvas.width / 2, 650);
     ctx.fillText("THE GOODLAND, IFAKO BUS-STOP, OGUDU OWOROSHOKI EXPRESSWAY, LAGOS", canvas.width / 2, 690);
 
@@ -1681,9 +1700,11 @@ function RegistrationAndHotel() {
                           id="regType"
                           className="bg-slate-50 w-full focus:outline-none focus:ring-2 focus:ring-[#dd7b30] focus:border-transparent px-3 py-2"
                           value={attendeeType}
-                          onChange={(e) =>
-                            setAttendeeType(e.target.value as AttendeeType)
-                          }
+                          onChange={(e) => {
+                            const next = e.target.value as AttendeeType;
+                            setAttendeeType(next);
+                            if (next !== "Volunteer") setDepartment("");
+                          }}
                         >
                           <option>General Attendee</option>
                           <option>Ministry Leader</option>
@@ -1711,6 +1732,33 @@ function RegistrationAndHotel() {
                         </select>
                       </div>
                     </div>
+
+                    {attendeeType === "Volunteer" && (
+                      <div className="space-y-2">
+                        <label
+                          htmlFor="regDepartment"
+                          className="text-[10px] font-bold uppercase tracking-widest text-slate-500"
+                        >
+                          Volunteer Department *
+                        </label>
+                        <select
+                          id="regDepartment"
+                          required
+                          className="bg-slate-50 w-full focus:outline-none focus:ring-2 focus:ring-[#dd7b30] focus:border-transparent px-3 py-2"
+                          value={department}
+                          onChange={(e) => setDepartment(e.target.value)}
+                        >
+                          <option value="" disabled>
+                            Select a department…
+                          </option>
+                          {VOLUNTEER_DEPARTMENTS.map((dept) => (
+                            <option key={dept} value={dept}>
+                              {dept}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
 
                     {formError && (
                       <div
