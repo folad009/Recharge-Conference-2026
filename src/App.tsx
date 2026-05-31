@@ -1382,10 +1382,26 @@ function RegistrationAndHotel() {
       ctx.lineTo(500, 300);
       ctx.stroke();
 
-      // Attendee tag
-      ctx.fillStyle = "#4f46e5";
-      ctx.font = "bold 24px monospace";
-      ctx.fillText("ATTENDEE", canvas.width / 2, 380);
+      // Attendee type — rendered as an indigo role pill
+      const typeLabel = attendeeType.toUpperCase();
+      ctx.font = "bold 22px monospace";
+      const pillPadX = 24;
+      const pillWidth = ctx.measureText(typeLabel).width + pillPadX * 2;
+      const pillHeight = 44;
+      const pillX = (canvas.width - pillWidth) / 2;
+      const pillY = 358;
+      ctx.fillStyle = "#4f46e5"; // indigo-600
+      ctx.beginPath();
+      if (typeof ctx.roundRect === "function") {
+        ctx.roundRect(pillX, pillY, pillWidth, pillHeight, pillHeight / 2);
+      } else {
+        ctx.rect(pillX, pillY, pillWidth, pillHeight);
+      }
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.textBaseline = "middle";
+      ctx.fillText(typeLabel, canvas.width / 2, pillY + pillHeight / 2 + 1);
+      ctx.textBaseline = "alphabetic";
 
       // Name
       const fullName =
