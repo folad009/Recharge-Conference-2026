@@ -1344,63 +1344,102 @@ function RegistrationAndHotel() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Background
-    ctx.fillStyle = "#0f172a"; // slate-900
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const renderBadge = (logo: HTMLImageElement | null) => {
+      // Background
+      ctx.fillStyle = "#0f172a"; // slate-900
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Border
-    ctx.strokeStyle = "#4f46e5"; // indigo-600
-    ctx.lineWidth = 20;
-    ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+      // Border
+      ctx.strokeStyle = "#4f46e5"; // indigo-600
+      ctx.lineWidth = 20;
+      ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
 
-    // Header
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 50px Inter, sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillText("RECHARGE", canvas.width / 2, 180);
+      ctx.textAlign = "center";
 
-    ctx.fillStyle = "#818cf8"; // indigo-400
-    ctx.font = "bold 20px monospace";
-    ctx.fillText("RECHARGE CONFERENCE 2026", canvas.width / 2, 220);
+      // Header — Recharge logo (replaces the old "RECHARGE" wordmark)
+      if (logo) {
+        const logoWidth = 360;
+        const logoHeight = logoWidth * (logo.height / logo.width);
+        ctx.drawImage(
+          logo,
+          (canvas.width - logoWidth) / 2,
+          200 - logoHeight / 2,
+          logoWidth,
+          logoHeight,
+        );
+      } else {
+        // Fallback if the logo can't be loaded
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 50px Inter, sans-serif";
+        ctx.fillText("RECHARGE", canvas.width / 2, 200);
+      }
 
-    // Divider
-    ctx.strokeStyle = "#334155"; // slate-700
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(100, 300);
-    ctx.lineTo(500, 300);
-    ctx.stroke();
+      // Divider
+      ctx.strokeStyle = "#334155"; // slate-700
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(100, 300);
+      ctx.lineTo(500, 300);
+      ctx.stroke();
 
-    // Attendee tag
-    ctx.fillStyle = "#4f46e5";
-    ctx.font = "bold 24px monospace";
-    ctx.fillText("ATTENDEE", canvas.width / 2, 380);
+      // Attendee tag
+      ctx.fillStyle = "#4f46e5";
+      ctx.font = "bold 24px monospace";
+      ctx.fillText("ATTENDEE", canvas.width / 2, 380);
 
-    // Name
-    const fullName = `${firstName} ${lastName}`.trim().toUpperCase() || "GUEST";
+      // Name
+      const fullName =
+        `${firstName} ${lastName}`.trim().toUpperCase() || "GUEST";
 
-    // Auto-scale text to fit width
-    let fontSize = 64;
-    ctx.font = `bold ${fontSize}px Inter, sans-serif`;
-    while (ctx.measureText(fullName).width > 500 && fontSize > 20) {
-      fontSize -= 2;
+      // Auto-scale text to fit width
+      let fontSize = 64;
       ctx.font = `bold ${fontSize}px Inter, sans-serif`;
-    }
+      while (ctx.measureText(fullName).width > 500 && fontSize > 20) {
+        fontSize -= 2;
+        ctx.font = `bold ${fontSize}px Inter, sans-serif`;
+      }
 
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText(fullName, canvas.width / 2, 480);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(fullName, canvas.width / 2, 480);
 
-    // Dates & Location
-    ctx.fillStyle = "#94a3b8"; // slate-400
-    ctx.font = "15px monospace";
-    ctx.fillText("JULY 1st - 5th, 2026", canvas.width / 2, 650);
-    ctx.fillText("THE GOODLAND, IFAKO BUS-STOP, OGUDU OWOROSHOKI EXPRESSWAY, LAGOS", canvas.width / 2, 690);
+      // Dates
+      ctx.fillStyle = "#94a3b8"; // slate-400
+      ctx.font = "15px monospace";
+      ctx.fillText("JULY 1st - 5th, 2026", canvas.width / 2, 650);
 
-    const dataUrl = canvas.toDataURL("image/png");
-    const a = document.createElement("a");
-    a.href = dataUrl;
-    a.download = `Recharge_Badge_${firstName || "Guest"}.png`;
-    a.click();
+      // Location — word-wrapped so it stays inside the badge box
+      const address =
+        "THE GOODLAND, IFAKO BUS-STOP, OGUDU OWOROSHOKI EXPRESSWAY, LAGOS";
+      ctx.font = "14px monospace";
+      const maxWidth = 480;
+      const words = address.split(" ");
+      const lines: string[] = [];
+      let current = "";
+      for (const word of words) {
+        const candidate = current ? `${current} ${word}` : word;
+        if (ctx.measureText(candidate).width > maxWidth && current) {
+          lines.push(current);
+          current = word;
+        } else {
+          current = candidate;
+        }
+      }
+      if (current) lines.push(current);
+      lines.forEach((line, i) => {
+        ctx.fillText(line, canvas.width / 2, 685 + i * 22);
+      });
+
+      const dataUrl = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = `Recharge_Badge_${firstName || "Guest"}.png`;
+      a.click();
+    };
+
+    const logo = new Image();
+    logo.onload = () => renderBadge(logo);
+    logo.onerror = () => renderBadge(null);
+    logo.src = "/images/RC2026-logo.png";
   };
 
   const toggleHotelDetails = (name: string) => {
