@@ -112,6 +112,41 @@ const SPEAKERS = [
     role: "Singer, and Worship Leader",
     image: "/images/speakers/RC-Speaker-KStrings.jpg",
   },
+   {
+    name: "ID Cabasa",
+    role: "Youth Conference, Guest Speaker",
+    image: "/images/speakers/RC-Speaker-Id-Cabasa.jpg",
+  },
+   {
+    name: "Philip",
+    role: "Youth Conference, Guest Speaker",
+    image: "/images/speakers/RC-Speakers-phillip.jpg",
+  },
+   {
+    name: "Gaise Baba",
+    role: "Youth Conference, Guest Speaker",
+    image: "/images/speakers/RC-Speakers-Gaise.jpg",
+  },
+   {
+    name: "Damilola",
+    role: "Youth Conference, Guest Speaker",
+    image: "/images/speakers/RC-Speakers-Damilola.jpg",
+  },
+   {
+    name: "Sefunmi",
+    role: "Youth Conference, Guest Speaker",
+    image: "/images/speakers/RC-Speakers-sefunmi.jpg",
+  },
+   {
+    name: "Pelumi",
+    role: "Youth Conference, Guest Speaker",
+    image: "/images/speakers/RC-Speakers-pelumi.jpg",
+  },
+   {
+    name: "Paul",
+    role: "Youth Conference, Guest Speaker",
+    image: "/images/speakers/RC-Speakers-paul.jpg",
+  },
 ];
 
 type ScheduleEvent = {
