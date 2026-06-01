@@ -11,7 +11,7 @@ if (!convexUrl) {
   console.warn(
     "[Recharge] VITE_CONVEX_URL is not set. Registration backend is disabled — " +
       "the form will simulate success but no data will be persisted. " +
-      "Run `npx convex dev` to provision a deployment and enable it.",
+      "Run `pnpm exec convex dev` to provision a deployment and enable it.",
   );
 }
 
