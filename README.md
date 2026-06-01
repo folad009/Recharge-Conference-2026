@@ -105,6 +105,7 @@ pnpm exec convex data registrations
 - `pnpm lint` - Run TypeScript type-check (`tsc --noEmit`)
 - `pnpm clean` - Remove build output (`dist`)
 - `pnpm run export:registrations` - Download all registrations as CSV (see above)
+- `pnpm run convex:deploy` - Push `convex/` to production (required before Vercel works)
 
 ## Project Structure
 
@@ -154,12 +155,20 @@ User browser
 Whenever you change files under `convex/`, push them to your **production** deployment:
 
 ```bash
+pnpm run convex:deploy
+```
+
+Or:
+
+```bash
 pnpm exec convex deploy
 ```
 
-Note the production deployment URL (e.g. `https://your-project-name.convex.cloud`). You will add this to Vercel.
+Confirm when prompted (first deploy pushes schema + functions to prod).
 
-Use `pnpm exec convex dev` for local work only—it syncs to your **dev** deployment, not production.
+**Critical:** `pnpm exec convex dev` only updates your **local/dev** deployment. The Vercel site uses **production** Convex. If you skip `convex deploy`, the live site will error on `registrations:count` and registration will fail.
+
+After deploy, the CLI prints your production URL (e.g. `https://your-project-name.convex.cloud`). Set that as `VITE_CONVEX_URL` on Vercel.
 
 ### 2. Connect the repo on Vercel
 
@@ -213,7 +222,24 @@ Optional for **Preview** deployments (PR branches):
 ### Updating the live site
 
 - **Frontend changes** (`src/`, assets): push to git; Vercel rebuilds automatically.
-- **Backend changes** (`convex/`): run `pnpm exec convex deploy`, then redeploy Vercel only if you also changed frontend env or code that depends on new API shapes.
+- **Backend changes** (`convex/`): run `pnpm run convex:deploy`, then redeploy Vercel only if you also changed frontend env or code that depends on new API shapes.
+
+### Troubleshooting
+
+**`[CONVEX Q(registrations:count)] Server Error` in the browser console**
+
+The frontend is connected to production Convex (`VITE_CONVEX_URL` is set), but production does not have your latest backend code yet. Fix:
+
+```bash
+pnpm run convex:deploy
+```
+
+Then hard-refresh the Vercel site. Verify in the dashboard (production deployment) → **Functions** that `registrations:count` and `registrations:register` exist.
+
+**Registration form “succeeds” but no data appears**
+
+- `VITE_CONVEX_URL` is missing on Vercel → add it and redeploy, or
+- Form is pointed at the wrong deployment → production URL must match `convex deploy` output.
 
 ## Build for Production
 
