@@ -241,6 +241,18 @@ Then hard-refresh the Vercel site. Verify in the dashboard (production deploymen
 - `VITE_CONVEX_URL` is missing on Vercel → add it and redeploy, or
 - Form is pointed at the wrong deployment → production URL must match `convex deploy` output.
 
+## Performance
+
+The site is tuned for fast first load:
+
+- **Code splitting** — registration + Convex load in a separate chunk when you scroll to the form
+- **Lazy sections** — content below the hero mounts as you scroll
+- **Images** — hero preloaded; speaker photos load lazily (carousel only loads nearby slides)
+- **No external placeholders** — about section uses local assets instead of third-party image hosts
+- **Self-hosted fonts** — Inter (variable, **Latin only**) and Space Mono (Latin 400/700) via `@fontsource` — no Google Fonts, smaller than full Unicode subsets
+
+Speaker photos in `public/images/speakers/` are the largest static assets (~4MB total). For even faster loads, compress them with [Squoosh](https://squoosh.app/) or convert to WebP before deploy.
+
 ## Build for Production
 
 Build locally to preview the production bundle:
