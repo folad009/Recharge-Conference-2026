@@ -1,20 +1,18 @@
 import React, { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
+import QRCode from "react-qr-code";
 import {
-  MapPin,
-  ChevronLeft,
-  ChevronRight,
-  ChevronDown,
-  ChevronUp,
   CheckCircle,
   Download,
   ArrowRight,
+  ShoppingBag,
 } from "lucide-react";
 import { api } from "../../convex/_generated/api";
-import { HOTELS } from "../data/hotels";
 import { hasConvexBackend } from "../lib/convex";
+
+const MERCH_STORE_URL = "https://take.app/gicresource";
 
 type AttendeeType =
   | "General Attendee"
@@ -41,10 +39,6 @@ export function RegistrationAndHotel() {
     "idle" | "submitting" | "success"
   >("idle");
   const [formError, setFormError] = useState<string | null>(null);
-  const [currentHotelPage, setCurrentHotelPage] = useState(0);
-  const [expandedHotelName, setExpandedHotelName] = useState<string | null>(
-    null,
-  );
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -60,23 +54,6 @@ export function RegistrationAndHotel() {
   const registeredCount = useQuery(
     api.registrations.count,
     hasConvex ? {} : "skip",
-  );
-
-  const itemsPerPage = 2;
-  const totalHotelPages = Math.ceil(HOTELS.length / itemsPerPage);
-
-  const handleHotelNext = () => {
-    setCurrentHotelPage((p) => (p + 1) % totalHotelPages);
-    setExpandedHotelName(null);
-  };
-  const handleHotelPrev = () => {
-    setCurrentHotelPage((p) => (p - 1 + totalHotelPages) % totalHotelPages);
-    setExpandedHotelName(null);
-  };
-
-  const displayedHotels = HOTELS.slice(
-    currentHotelPage * itemsPerPage,
-    (currentHotelPage + 1) * itemsPerPage,
   );
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -257,10 +234,6 @@ export function RegistrationAndHotel() {
     logo.src = "/images/RC2026-logo.png";
   };
 
-  const toggleHotelDetails = (name: string) => {
-    setExpandedHotelName((prev) => (prev === name ? null : name));
-  };
-
   return (
     <section id="register" className="py-24 bg-white border-b border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -296,123 +269,38 @@ export function RegistrationAndHotel() {
               </div>
             )}
 
-            <div className="bg-slate-50 border border-slate-200 p-6 flex flex-col justify-between mt-auto">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-[#dd7b30] flex items-center gap-2">
-                    <MapPin size={14} /> Accommodation
-                  </h3>
-                  <div className="flex gap-1">
-                    <button
-                      onClick={handleHotelPrev}
-                      aria-label="Previous hotels"
-                      className="p-1 border border-slate-200 hover:bg-slate-100 text-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30]"
-                    >
-                      <ChevronLeft size={14} />
-                    </button>
-                    <button
-                      onClick={handleHotelNext}
-                      aria-label="Next hotels"
-                      className="p-1 border border-slate-200 hover:bg-slate-100 text-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30]"
-                    >
-                      <ChevronRight size={14} />
-                    </button>
-                  </div>
-                </div>
-                <div className="space-y-4 font-mono text-[11px] min-h-35">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={currentHotelPage}
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="space-y-4"
-                    >
-                      {displayedHotels.map((hotel, idx) => (
-                        <div
-                          key={idx}
-                          className="flex flex-col border-b border-slate-200 pb-4 last:border-0 last:pb-0"
-                        >
-                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
-                            <div className="mb-2 sm:mb-0">
-                              <p className="font-bold text-slate-900 uppercase">
-                                {hotel.name}
-                              </p>
-                              <p className="text-slate-500">
-                                {hotel.type}{" "}
-                                {hotel.distance ? `• ${hotel.distance}` : ""}
-                              </p>
-                              <button
-                                onClick={() => toggleHotelDetails(hotel.name)}
-                                aria-expanded={expandedHotelName === hotel.name}
-                                aria-controls={`hotel-details-${idx}`}
-                                className="text-[#dd7b30] mt-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-1 flex items-center gap-1 font-bold text-[10px] uppercase tracking-widest rounded-sm"
-                              >
-                                View Details{" "}
-                                {expandedHotelName === hotel.name ? (
-                                  <ChevronUp size={12} />
-                                ) : (
-                                  <ChevronDown size={12} />
-                                )}
-                              </button>
-                            </div>
-                            <div className="flex flex-col items-start sm:items-end gap-2 shrink-0">
-                              <span
-                                className={`font-bold border px-2 py-0.5 ${hotel.isPrimary ? "text-[#dd7b30] border-[#dd7b30] bg-white" : "text-slate-500 border-slate-200 bg-slate-100"}`}
-                              >
-                                {hotel.rateType}
-                              </span>
-                              <a
-                                href={hotel.bookingLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="border-2 border-slate-900 px-3 py-1.5 text-[10px] font-black uppercase hover:bg-slate-900 hover:text-white transition-colors w-full sm:w-auto text-center inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 focus-visible:ring-offset-2"
-                              >
-                                Book Now
-                              </a>
-                            </div>
-                          </div>
-                          <AnimatePresence>
-                            {expandedHotelName === hotel.name && (
-                              <motion.div
-                                id={`hotel-details-${idx}`}
-                                role="region"
-                                aria-label={`${hotel.name} details`}
-                                initial={{
-                                  height: 0,
-                                  opacity: 0,
-                                  marginTop: 0,
-                                }}
-                                animate={{
-                                  height: "auto",
-                                  opacity: 1,
-                                  marginTop: 12,
-                                }}
-                                exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                                className="overflow-hidden bg-white border border-slate-200 p-3 flex flex-col gap-2 rounded-sm"
-                              >
-                                <p className="text-slate-600">
-                                  <span className="font-bold text-slate-900">
-                                    Amenities:
-                                  </span>{" "}
-                                  {hotel.amenities.join(", ")}
-                                </p>
-                                <p className="text-slate-600">
-                                  <span className="font-bold text-slate-900">
-                                    Contact:
-                                  </span>{" "}
-                                  {hotel.contactNumber}
-                                </p>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      ))}
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-              </div>
+            <div className="bg-slate-50 border border-slate-200 p-6 flex flex-col items-center text-center mt-auto">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-[#dd7b30] flex items-center gap-2 mb-4 self-start">
+                <ShoppingBag size={14} aria-hidden />
+                Official Merch
+              </h3>
+              <p className="text-sm font-mono text-slate-700 mb-6 leading-relaxed max-w-sm">
+                Order your official conference merch today!
+              </p>
+              <a
+                href={MERCH_STORE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block p-4 bg-white border border-slate-200 shadow-sm hover:border-[#dd7b30] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-2"
+                aria-label="Order RC 2026 merchandise — opens take.app/gicresource"
+              >
+                <QRCode
+                  value={MERCH_STORE_URL}
+                  size={168}
+                  level="M"
+                  fgColor="#0f172a"
+                  bgColor="#ffffff"
+                  title="RC 2026 merchandise store"
+                />
+              </a>
+              <a
+                href={MERCH_STORE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 text-[10px] font-mono uppercase tracking-widest text-[#dd7b30] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-1 rounded-sm"
+              >
+                take.app/gicresource
+              </a>
             </div>
           </div>
 
