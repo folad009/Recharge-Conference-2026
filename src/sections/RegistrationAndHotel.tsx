@@ -258,16 +258,17 @@ export function RegistrationAndHotel() {
                 href={MERCH_STORE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block p-4 bg-white border border-slate-200 shadow-sm hover:border-[#dd7b30] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-2"
+                className="inline-block w-full max-w-[280px] p-5 bg-white border border-slate-200 shadow-sm hover:border-[#dd7b30] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#dd7b30] focus-visible:ring-offset-2"
                 aria-label="Order RC 2026 merchandise — opens take.app/gicresource"
               >
                 <QRCode
                   value={MERCH_STORE_URL}
-                  size={168}
+                  size={256}
                   level="M"
                   fgColor="#0f172a"
                   bgColor="#ffffff"
                   title="RC 2026 merchandise store"
+                  style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                 />
               </a>
               <a
