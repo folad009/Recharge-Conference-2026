@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import { motion } from "motion/react";
 import QRCode from "react-qr-code";
@@ -51,10 +51,6 @@ export function RegistrationAndHotel() {
 
   const hasConvex = hasConvexBackend;
   const register = useMutation(api.registrations.register);
-  const registeredCount = useQuery(
-    api.registrations.count,
-    hasConvex ? {} : "skip",
-  );
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -249,25 +245,6 @@ export function RegistrationAndHotel() {
               Registration is completely free, but space is limited. Please let
               us know you're coming so we can prepare for you!
             </p>
-
-            {hasConvex && (
-              <div
-                className="mb-10 inline-flex items-center gap-3 self-start border border-slate-200 bg-slate-50 px-4 py-2 font-mono text-[11px] uppercase tracking-widest text-slate-700"
-                aria-live="polite"
-              >
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#dd7b30] opacity-75"></span>
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#dd7b30]"></span>
-                </span>
-                <span>
-                  {registeredCount === undefined
-                    ? "Loading attendees…"
-                    : `${registeredCount.toLocaleString()} ${
-                        registeredCount === 1 ? "person" : "people"
-                      } registered`}
-                </span>
-              </div>
-            )}
 
             <div className="bg-slate-50 border border-slate-200 p-6 flex flex-col items-center text-center mt-auto">
               <h3 className="text-xs font-bold uppercase tracking-widest text-[#dd7b30] flex items-center gap-2 mb-4 self-start">
